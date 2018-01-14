@@ -8,7 +8,7 @@ export const MediaSizes = {
     xl: '1200px'
 }
 const GridSize = 24;
-const GridGutter = 30;
+const GridGutter = 4;
 
 export const ContainerFluid = styled.div`
     display: block;
@@ -33,6 +33,8 @@ export const Row = styled.div`
     ${props => props.AlignSelf && `align-self: ${props.AlignSelf}`};
     ${props => props.AlignItems && `align-items: ${props.AlignItems}`};
     ${props => props.MobileHidden && `display: none`};
+    ${props => props.Margin && `margin: ${props.Margin}`};
+    ${props => props.Padding && `padding: ${props.Padding}`};
 
     @media (min-width: ${MediaSizes.md}) {
         ${props => props.MobileHidden && `display: block`};
@@ -105,11 +107,13 @@ export const Column = styled.div`
     ${props => props.OrderXs && `order: ${props.OrderXs}`};
     ${props => props.mgb && `margin-bottom: ${props.mgb}`};
     ${props => props.mgt && `margin-top: ${props.mgt}`};
+    ${props => props.LeftOffsetXs && `margin-left: auto!important;`};
+    ${props => props.RightOffsetXS && `margin-right: auto!important;`};
     ${props => getStylingForProps(props)};
     ${props => columnStyles.xs};
 
     @media (min-width: ${MediaSizes.sm}) {
-        ${props => props.LeftOffsetSm && `margin-left: auto!important;`};
+        ${props => props.LeftOffsetSm && `marsgin-left: auto!important;`};
         ${props => props.RightOffsetSm && `margin-right: auto!important;`};
         ${props => props.OrderSm && `order: ${props.OrderSm}`};
         ${props => columnStyles.sm};

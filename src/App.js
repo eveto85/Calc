@@ -13,7 +13,7 @@ class App extends Component {
     render() {
         return (
             <PageStyled>
-                <ContainerFluid width="480px">
+                <ContainerFluid width="430px">
                     <Calculator />
                 </ContainerFluid>
             </PageStyled>
