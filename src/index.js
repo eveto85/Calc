@@ -9,7 +9,8 @@ import { Provider } from 'react-redux';
 import appReducer from './reducers/appReducer';
 
 const store = createStore(
-  appReducer
+  appReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
 
 WebFont.load({

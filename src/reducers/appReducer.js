@@ -1,118 +1,183 @@
 import { combineReducers } from 'redux';
-import { REMOVE_EVERYTHING, REMOVE_LAST_DIGIT, ADD_INPUT, ADD_OPERATOR, ADD_PARENTH } from '../actions';
-import { isItNumber } from '../shared/helpers';
+import { REMOVE_EVERYTHING, REMOVE_LAST_DIGIT, ADD_INPUT, ADD_OPERATOR, ADD_PARENTH, ADD_PERCENT, ADD_NEGATION } from '../actions';
+import { joinExpressionsIntoString, isItNumber } from '../shared/helpers';
 
 //reducers
-const calculations = (state = {calculations: "0", result: 0, input: '', operator: '', parenth: '', parenthsOpened: 0, parenthsClosed: 0}, action) => {
-    let { operator, input, parenth, parenthsOpened, parenthsClosed} = state;
-    
-    console.log(action.type);
+const initialState = {
+    input: '',
+    operator: '',
+    parenth: '',
+    expressions: [],
+    displayedString: '',
+    result: 0,
+}
+/* state.expressions = [{type: 'input': value:'8'}];
+    curly brackets after each case are for keeping let's in the specific case's block scope, a switch is normally single block
+*/
+const calculations = (state = initialState, action) => {    
+    let { input, parenth, operator, expressions } = state;
+    let actionInput = action.input;
+    let actionOperator = action.operator;
+    let actionParenth = action.parenth;
+
     switch (action.type) {
-    case REMOVE_EVERYTHING:
-        return {
-            ...state,
-            input: '',
-            operator: '',
-            parenth: '',
-            calculations: '0',
-            parenthsOpened: 0,
-            parenthsClosed: 0
-        }
-    case REMOVE_LAST_DIGIT:
-        let newCalcs = state.calculations.slice(0,-1) || '0';
-        let input = '';
-        let operator = '';
-        let parenth = '';
-        if (newCalcs !== '0') {
-            let newCalcsArr = newCalcs.split('');
-            const newCalcsArrLength = newCalcsArr.length;
-            newCalcsArr.forEach((item,i) => {
-                if (item === '(') {
-                    parenthsOpened++;
-                }
-                if (item === ')') {
-                    parenthsClosed++;
-                }
-                if (i === newCalcsArrLength - 1) {
-                    if (isItNumber(item)) {
-                        console.log('input');
-                        input = item;
-                    }
-                    if (item === '(' || item === ')') {
-                        parenth = item;
-                        console.log('input');
-                    } else {
-                        operator = item;
-                        console.log('input');
-                    }
-                }
-
-            });
-        }
-        return {
-            ...state,
-            input: input,
-            operator: operator,
-            parenth: parenth,
-            calculations: newCalcs,
-            parenthsOpened: parenthsOpened,
-            parenthsClosed: parenthsClosed
-        }
-    case ADD_INPUT:
-        return {
-            ...state,
-            input: action.input,
-            operator: '',
-            parenth: '',
-            calculations: state.calculations === '0' ? action.input : state.calculations + action.input
-        }
-    case ADD_OPERATOR:
-        let currentCalcs = state.calculations;
-        let actionOperator = action.operator;
-        if (currCalcs === '0') {
-            actionOperator = '';
-        }
-        if (state.operator) {
-            currentCalcs = state.calculations.slice(0,-1) + actionOperator;
-        } 
-        if (state.input) {
-            currentCalcs += actionOperator;
-        }
-        return {
-            ...state,
-            input: '',
-            operator: actionOperator,
-            parenth: '',
-            calculations: currentCalcs
-        }
-    case ADD_PARENTH:
-        let currCalcs = state.calculations;
-
-        if (action.parenth === '(') {
-            if (currCalcs === '0') {
-                currCalcs = action.parenth;
-                parenthsOpened++;
-            } else {
-                currCalcs += action.parenth;
-                parenthsOpened++;
+        case REMOVE_EVERYTHING:
+            return {
+                ...state,
+                input: '',
+                operator: '',
+                parenth: '',
+                expressions: [],
+                displayedString: '',
+                result: 0,
             }
-        } else {
-            if (state.parenthsOpened > state.parenthsClosed +1) {
-                currCalcs += action.parenth;
-                parenthsClosed++;
+        case REMOVE_LAST_DIGIT: {
+        // TODO set the correct type
+            if (expressions.length > 0) {
+                if (expressions[expressions.length - 1].value.length === 1) {
+                    expressions.pop();
+                } else {
+                    expressions[expressions.length - 1].value = expressions[expressions.length - 1].value.slice(0,-1);
+                }
+                if (expressions.length) {
+                    const { type, value } = expressions[expressions.length - 1];
+                    input =''; parenth = ''; operator = '';
+
+                    switch (type) {
+                        case 'input':
+                            input = value[value.length - 1];
+                        break;
+                        case 'operator':
+                            operator = value[value.length - 1];
+                        break;
+                        case 'parenth':
+                            parenth = value[value.length - 1];
+                        break;
+                    }
+                }
+            }
+            return {
+                ...state,
+                input: input,
+                operator: operator,
+                parenth: parenth,
+                displayedString: joinExpressionsIntoString(expressions),
+                expressions: expressions
+            }
+        }
+        case ADD_INPUT: 
+            if (expressions.length && expressions[expressions.length - 1].type === 'input') {
+    /*             Making sure we don't get more than one decimal separator */ 
+            if (actionInput === '.' && expressions[expressions.length - 1].value.includes('.')) {
+                    return state;
+                } else {
+                    expressions[expressions.length - 1].value += actionInput;
+                    input = actionInput;
+                    operator = '';
+                    parenth = '';
+                }
+            } else {
+                expressions.push({type: 'input', value: actionInput});
+                input = actionInput;
+                operator = '';
+                parenth = '';
+            }
+            return {
+                ...state,
+                input: input,
+                operator: operator,
+                parenth: parenth,
+                displayedString: joinExpressionsIntoString(expressions),
+                expressions: expressions
+            }
+        case ADD_OPERATOR: 
+            if (expressions.length === 0) {
+                return state;
+            }
+            if (operator && expressions[expressions.length - 1].type === 'operator') {
+                expressions[expressions.length - 1].value === actionOperator;
+                operator = actionOperator;
+                parenth = '';
+                input = '';
             } 
+            if (input) {
+                expressions.push({type: 'operator', value: actionOperator});
+                operator = actionOperator;
+                parenth = '';
+                input = '';
+            }
+            return {
+                ...state,
+                input: input,
+                operator: actionOperator,
+                parenth: parenth,
+                expressions: expressions,
+                displayedString: joinExpressionsIntoString(expressions)
+            }
+        case ADD_PARENTH: {
+            let openedParentheses = 0;
+            let closedParentheses = 0;
+            expressions.forEach(exp => {
+                if (exp.value === '(') {openedParentheses++}
+                if (exp.value === ')') {closedParentheses++}
+            });
+
+            if (actionParenth === '(') {
+                if (expressions.length === 0 || operator || parenth) {
+                    expressions.push({type: 'parenth', value: actionParenth});
+                    parenth = actionParenth;
+                    input = '';
+                    operator = '';
+                } else {
+                    return state;
+                }
+            } else {
+                if (openedParentheses > closedParentheses) {
+                    expressions.push({type: 'parenth', value: actionParenth});
+                    parenth = actionParenth;                
+                    input = '';
+                    operator = '';
+                } else {
+                    return state;
+                }
+            }
+            return {
+                ...state,
+                input: input,
+                operator: operator,
+                parenth: parenth,
+                displayedString: joinExpressionsIntoString(expressions),
+                expressions: expressions
+            }
         }
-        return {
-            ...state,
-            operator: '',
-            input: '',
-            parenth: action.parenth,
-            calculations: currCalcs,
-            parentsOpened: parenthsOpened,
-            parentsClosed: parenthsClosed
-        }
-    default:
-        return state
+        case ADD_PERCENT: 
+            const lastExpressionValue = expressions[expressions.length - 1].value;
+            if (input && isItNumber(lastExpressionValue) && lastExpressionValue !== '0' && lastExpressionValue !== '.') {
+                const fixedDigitsLength =  lastExpressionValue.replace(/^-?\d*\.?/, '').length;
+                expressions[expressions.length - 1].value = ((parseFloat(lastExpressionValue))/100).toFixed(fixedDigitsLength + 2);
+            } else {
+                return state;
+            }
+            return {
+                ...state,
+                input: input,
+                operator: operator,
+                parenth: parenth,
+                displayedString: joinExpressionsIntoString(expressions),
+                expressions: expressions
+            }
+            case ADD_NEGATION: 
+
+            return {
+                ...state,
+                input: input,
+                operator: operator,
+                parenth: parenth,
+                displayedString: joinExpressionsIntoString(expressions),
+                expressions: expressions
+            }
+        default:
+            return state
     }
 }
 

@@ -26,15 +26,21 @@ class Button extends Component {
         super(props);
         this.onButtonClick = this.onButtonClick.bind(this);
     }
+
     onButtonClick (){
         if (isItNumber(this.props.value) || this.props.value === '.') {
             this.props.addInput(this.props.value);
         } else if (this.props.value === '(' || this.props.value === ')') {
             this.props.addParenth(this.props.value);
+        } else if (this.props.type === 'percent') {
+            this.props.addPercent(this.props.value);
+        } else if (this.props.type === 'negation') {
+            this.props.toggleNegation(this.props.value);
         } else {
             this.props.addOperator(this.props.value);
         }
     }
+    
     render() {
         return (
             <ButtonStyled type={this.props.type} onClick={this.onButtonClick}>

@@ -39,7 +39,7 @@ class Display extends Component {
             <DisplayStyled>
                 <Row Padding="1em 15px">
                     <Column>
-                        <ScreenCalculationsStyled>{this.props.calculations}</ScreenCalculationsStyled>
+                        <ScreenCalculationsStyled>{this.props.displayedString || '0'}</ScreenCalculationsStyled>
                         <ScreenResultStyled>{this.props.result}</ScreenResultStyled>
                     </Column>
                 </Row>
@@ -59,7 +59,7 @@ class Display extends Component {
 Display.propTypes = {
     removeEverything: PropTypes.func.isRequired,
     removeLastDigit: PropTypes.func.isRequired,
-    calculations: PropTypes.string,
+    displayedString: PropTypes.string,
     result: PropTypes.number,
 };
 

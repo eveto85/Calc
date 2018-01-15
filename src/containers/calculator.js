@@ -6,7 +6,7 @@ import Button from '../components/button';
 import styled from 'styled-components';
 import { colors } from '../shared/colors';
 import { buttons } from '../shared/helpers';
-import { removeEverything, removeLastDigit, addInput, addOperator, addParenth} from '../actions/index';
+import { removeEverything, removeLastDigit, addInput, addOperator, addParenth, addPercent, toggleNegation} from '../actions/index';
 
 const CalculatorStyled = styled.div`
     background-color: ${colors.backGroundDarkColor};
@@ -17,13 +17,7 @@ const CalculatorStyled = styled.div`
     }
 `;
 
-const calculatorOperations = {
-    '/': (prevValue, nextValue) => prevValue / nextValue,
-    '*': (prevValue, nextValue) => prevValue * nextValue,
-    '+': (prevValue, nextValue) => prevValue + nextValue,
-    '-': (prevValue, nextValue) => prevValue - nextValue,
-    '=': (prevValue, nextValue) => nextValue
-}
+const basicOperations = ['/','*','+','-','='];
 
 class Calculator extends Component {
     constructor(props){
@@ -43,30 +37,30 @@ class Calculator extends Component {
         if (key === 'Enter')
             key = '='
         if ((/\d/).test(key)) {
-            event.preventDefault()
+            event.preventDefault();
             this.props.addInput(key);
-        } else if (key in calculatorOperations) {
-            event.preventDefault()
-            this.props.addOperator(key)
+        } else if (basicOperations.includes(key)) {
+            event.preventDefault();
+            this.props.addOperator(key);
         } else if (key === '.') {
-            event.preventDefault()
+            event.preventDefault();
             this.props.addInput(key);
         } else if (key === '%') {
-            event.preventDefault()
-            this.props.addOperator(key)
+            event.preventDefault();
+            this.props.addPercent();
         } else if (key === '(') {
-            event.preventDefault()
-            this.props.addParenth(key)
+            event.preventDefault();
+            this.props.addParenth(key);
         } else if (key === ')') {
-            event.preventDefault()
-            this.props.addParenth(key)
+            event.preventDefault();
+            this.props.addParenth(key);
         } else if (key === 'Backspace') {
-            event.preventDefault()
-            this.props.removeLastDigit()
+            event.preventDefault();
+            this.props.removeLastDigit();
         } else if (key === 'Clear' || key === 'Escape') {
-            event.preventDefault()
-            if (this.props.calculations !== '0') {
-                this.props.removeEverything()
+            event.preventDefault();
+            if (this.props.displayedString !== '') {
+                this.props.removeEverything();
             }
         }
     }
@@ -75,12 +69,12 @@ class Calculator extends Component {
             <Row>
                 <Column>
                     <CalculatorStyled>
-                        <DisplayStyled removeEverything={this.props.removeEverything} removeLastDigit={this.props.removeLastDigit} calculations={this.props.calculations} result={this.props.result}/>
+                        <DisplayStyled removeEverything={this.props.removeEverything} removeLastDigit={this.props.removeLastDigit} displayedString={this.props.displayedString} result={this.props.result}/>
                         <Row>
                         {
                             buttons.map(butt =>
                                 <Column xs="6" key={butt.value}>
-                                    <Button type={butt.type} value={butt.value} addInput={this.props.addInput} addOperator={this.props.addOperator} addParenth={this.props.addParenth} />
+                                    <Button type={butt.type} value={butt.value} addInput={this.props.addInput} addOperator={this.props.addOperator} addParenth={this.props.addParenth} addPercent={this.props.addPercent} toggleNegation={this.props.toggleNegation} />
                                 </Column>
                             )
                         }
@@ -94,7 +88,7 @@ class Calculator extends Component {
 
 const mapStateToProps = state => ({
     result: state.calculations.result,
-    calculations: state.calculations.calculations,
+    displayedString: state.calculations.displayedString,
     input: state.calculations.input
 })
 
@@ -103,6 +97,8 @@ const mapDispatchToProps = {
     removeLastDigit,
     addInput,
     addOperator,
-    addParenth
+    addParenth,
+    addPercent, 
+    toggleNegation
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Calculator);
