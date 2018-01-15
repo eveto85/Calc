@@ -6,7 +6,7 @@ import Button from '../components/button';
 import styled from 'styled-components';
 import { colors } from '../shared/colors';
 import { buttons } from '../shared/helpers';
-import { removeEverything, removeLastDigit, addInput, addOperator, addParenth, addPercent, toggleNegation} from '../actions/index';
+import { removeEverything, removeLastDigit, addInput, addOperator, addParenth, addPercent, toggleNegation, calculate } from '../actions/index';
 
 const CalculatorStyled = styled.div`
     background-color: ${colors.backGroundDarkColor};
@@ -17,7 +17,7 @@ const CalculatorStyled = styled.div`
     }
 `;
 
-const basicOperations = ['/','*','+','-','='];
+const basicOperations = ['/','*','+','-'];
 
 class Calculator extends Component {
     constructor(props){
@@ -25,17 +25,19 @@ class Calculator extends Component {
         this.handleKeyDown = this.handleKeyDown.bind(this);
     }
     componentDidMount() {
-        document.addEventListener('keydown', this.handleKeyDown)
+        document.addEventListener('keydown', this.handleKeyDown);
     }
       
     componentWillUnmount() {
-        document.removeEventListener('keydown', this.handleKeyDown)
+        document.removeEventListener('keydown', this.handleKeyDown);
     }
 
     handleKeyDown(event) {
         let { key } = event;
         if (key === 'Enter')
-            key = '='
+            key = '=';
+            event.preventDefault();            
+            this.props.calculate();
         if ((/\d/).test(key)) {
             event.preventDefault();
             this.props.addInput(key);
@@ -59,9 +61,7 @@ class Calculator extends Component {
             this.props.removeLastDigit();
         } else if (key === 'Clear' || key === 'Escape') {
             event.preventDefault();
-            if (this.props.displayedString !== '') {
-                this.props.removeEverything();
-            }
+            this.props.removeEverything();
         }
     }
     render() {
@@ -69,12 +69,12 @@ class Calculator extends Component {
             <Row>
                 <Column>
                     <CalculatorStyled>
-                        <DisplayStyled removeEverything={this.props.removeEverything} removeLastDigit={this.props.removeLastDigit} displayedString={this.props.displayedString} result={this.props.result}/>
+                        <DisplayStyled removeEverything={this.props.removeEverything} removeLastDigit={this.props.removeLastDigit} displayedString={this.props.displayedString} result={this.props.result} calculatingDone={this.props.calculatingDone} />
                         <Row>
                         {
                             buttons.map(butt =>
                                 <Column xs="6" key={butt.value}>
-                                    <Button type={butt.type} value={butt.value} addInput={this.props.addInput} addOperator={this.props.addOperator} addParenth={this.props.addParenth} addPercent={this.props.addPercent} toggleNegation={this.props.toggleNegation} />
+                                    <Button type={butt.type} value={butt.value} addInput={this.props.addInput} addOperator={this.props.addOperator} addParenth={this.props.addParenth} addPercent={this.props.addPercent} toggleNegation={this.props.toggleNegation} calculate={this.props.calculate}/>
                                 </Column>
                             )
                         }
@@ -89,8 +89,8 @@ class Calculator extends Component {
 const mapStateToProps = state => ({
     result: state.calculations.result,
     displayedString: state.calculations.displayedString,
-    input: state.calculations.input
-})
+    calculatingDone: state.calculations.calculatingDone
+});
 
 const mapDispatchToProps = {
     removeEverything,
@@ -99,6 +99,7 @@ const mapDispatchToProps = {
     addOperator,
     addParenth,
     addPercent, 
-    toggleNegation
+    toggleNegation,
+    calculate
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Calculator);

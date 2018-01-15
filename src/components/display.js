@@ -40,7 +40,7 @@ class Display extends Component {
                 <Row Padding="1em 15px">
                     <Column>
                         <ScreenCalculationsStyled>{this.props.displayedString || '0'}</ScreenCalculationsStyled>
-                        <ScreenResultStyled>{this.props.result}</ScreenResultStyled>
+                        <ScreenResultStyled active={this.props.calculatingDone}>{this.props.result}</ScreenResultStyled>
                     </Column>
                 </Row>
                 <Row JustifyContent="space-between" Padding="0.7em 0">
@@ -61,6 +61,7 @@ Display.propTypes = {
     removeLastDigit: PropTypes.func.isRequired,
     displayedString: PropTypes.string,
     result: PropTypes.number,
+    calculatingDone: PropTypes.bool,
 };
 
 export default Display;

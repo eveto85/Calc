@@ -4,7 +4,9 @@ export const ADD_INPUT = 'ADD_INPUT';
 export const ADD_OPERATOR = 'ADD_OPERATOR';
 export const ADD_PARENTH = 'ADD_PARENTH';
 export const ADD_PERCENT = 'ADD_PERCENT';
-export const ADD_NEGATION = 'ADD_NEGATION';
+export const TOGGLE_NEGATION = 'TOGGLE_NEGATION';
+export const CALCULATE = 'CALCULATE';
+
 
 //action creators
 export const removeEverything = () => ({
@@ -35,5 +37,8 @@ export const addPercent = () => ({
 });
 
 export const toggleNegation = () => ({
-    type: ADD_NEGATION
+    type: TOGGLE_NEGATION
+});
+export const calculate = () => ({
+    type: CALCULATE
 });

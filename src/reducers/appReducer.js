@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { REMOVE_EVERYTHING, REMOVE_LAST_DIGIT, ADD_INPUT, ADD_OPERATOR, ADD_PARENTH, ADD_PERCENT, ADD_NEGATION } from '../actions';
+import { REMOVE_EVERYTHING, REMOVE_LAST_DIGIT, ADD_INPUT, ADD_OPERATOR, ADD_PARENTH, ADD_PERCENT, TOGGLE_NEGATION, CALCULATE } from '../actions';
 import { joinExpressionsIntoString, isItNumber } from '../shared/helpers';
 
 //reducers
@@ -10,15 +10,27 @@ const initialState = {
     expressions: [],
     displayedString: '',
     result: 0,
+    calculatingDone: false
 }
 /* state.expressions = [{type: 'input': value:'8'}];
     curly brackets after each case are for keeping let's in the specific case's block scope, a switch is normally single block
 */
 const calculations = (state = initialState, action) => {    
-    let { input, parenth, operator, expressions } = state;
+    let { input, parenth, operator, expressions, result } = state;
     let actionInput = action.input;
     let actionOperator = action.operator;
     let actionParenth = action.parenth;
+    let openedParentheses = 0;
+    let closedParentheses = 0;
+    let lastExpressionValue;
+
+    if (expressions.length > 0) {
+        expressions.forEach(exp => {
+            lastExpressionValue = expressions[expressions.length - 1].value;
+            if (exp.value === '(') {openedParentheses++}
+            if (exp.value === ')') {closedParentheses++}
+        });
+    }
 
     switch (action.type) {
         case REMOVE_EVERYTHING:
@@ -100,7 +112,7 @@ const calculations = (state = initialState, action) => {
                 parenth = '';
                 input = '';
             } 
-            if (input) {
+            if (input || parenth === ')') {
                 expressions.push({type: 'operator', value: actionOperator});
                 operator = actionOperator;
                 parenth = '';
@@ -109,19 +121,12 @@ const calculations = (state = initialState, action) => {
             return {
                 ...state,
                 input: input,
-                operator: actionOperator,
+                operator: operator,
                 parenth: parenth,
                 expressions: expressions,
                 displayedString: joinExpressionsIntoString(expressions)
             }
         case ADD_PARENTH: {
-            let openedParentheses = 0;
-            let closedParentheses = 0;
-            expressions.forEach(exp => {
-                if (exp.value === '(') {openedParentheses++}
-                if (exp.value === ')') {closedParentheses++}
-            });
-
             if (actionParenth === '(') {
                 if (expressions.length === 0 || operator || parenth) {
                     expressions.push({type: 'parenth', value: actionParenth});
@@ -150,11 +155,23 @@ const calculations = (state = initialState, action) => {
                 expressions: expressions
             }
         }
-        case ADD_PERCENT: 
-            const lastExpressionValue = expressions[expressions.length - 1].value;
+        case ADD_PERCENT: {
             if (input && isItNumber(lastExpressionValue) && lastExpressionValue !== '0' && lastExpressionValue !== '.') {
                 const fixedDigitsLength =  lastExpressionValue.replace(/^-?\d*\.?/, '').length;
                 expressions[expressions.length - 1].value = ((parseFloat(lastExpressionValue))/100).toFixed(fixedDigitsLength + 2);
+            } else {
+                return state;
+            }
+            return {
+                ...state,
+                displayedString: joinExpressionsIntoString(expressions),
+                expressions: expressions
+            }
+        }
+        case TOGGLE_NEGATION: 
+            if (input && isItNumber(lastExpressionValue) && lastExpressionValue !== '0' && lastExpressionValue !== '.') {
+                const newValue = parseFloat(lastExpressionValue) * -1;
+                expressions[expressions.length - 1].value = String(newValue);
             } else {
                 return state;
             }
@@ -166,16 +183,35 @@ const calculations = (state = initialState, action) => {
                 displayedString: joinExpressionsIntoString(expressions),
                 expressions: expressions
             }
-            case ADD_NEGATION: 
+        case CALCULATE: {
+            let { displayedString, calculatingDone } = state;
 
+            if (expressions.length) {
+                if (openedParentheses > closedParentheses || expressions[expressions.length - 1].type === 'operator') {
+                    alert("You're missing some closing parentheses");
+                    return state;
+                }
+                displayedString = joinExpressionsIntoString(expressions);                    
+
+                try {
+                    result = eval(displayedString);
+                    calculatingDone = true;
+                  }
+                  catch(error) {
+                    console.error(error);
+                    alert("Something went totally wrong! Try pressing F12(Windows) or Cmd+Alt+I(Mac) when the console opens calculate whatever you wanted me to calculate. "+error);
+
+                  }
+            } else {
+                return state;
+            }
             return {
                 ...state,
-                input: input,
-                operator: operator,
-                parenth: parenth,
-                displayedString: joinExpressionsIntoString(expressions),
-                expressions: expressions
+                displayedString,
+                result: result,
+                calculatingDone
             }
+        }
         default:
             return state
     }
@@ -183,6 +219,6 @@ const calculations = (state = initialState, action) => {
 
 const appReducer = combineReducers({
     calculations
-})
+});
 
 export default appReducer;
