@@ -11,7 +11,7 @@ const initialState = {
     parenth: '',
     expressions: [],
     displayedString: '',
-    result: 0,
+    result: "0",
     calculatingDone: false
 }
 /* state.expressions = [{type: 'input': value:'8'}];
@@ -26,7 +26,7 @@ const calculations = (state = initialState, action) => {
             parenth: '',
             expressions: [],
             displayedString: '',
-            result: 0,
+            result: "0",
             calculatingDone: false
         }
     }
@@ -54,7 +54,7 @@ const calculations = (state = initialState, action) => {
                 parenth: '',
                 expressions: [],
                 displayedString: '',
-                result: 0,
+                result: "0",
                 calculatingDone: false
             }
         case REMOVE_LAST_DIGIT: {
@@ -151,7 +151,7 @@ const calculations = (state = initialState, action) => {
                     return state;
                 }
             } else {
-                if (openedParentheses > closedParentheses && expressions[expressions.length - 1].value !== '(') {
+                if (openedParentheses > closedParentheses && expressions[expressions.length - 1].value !== '(' && !operator) {
                     expressions.push({type: 'parenth', value: actionParenth});
                     parenth = actionParenth;                
                     input = '';
@@ -208,7 +208,7 @@ const calculations = (state = initialState, action) => {
                 displayedString = joinExpressionsIntoString(expressions);                    
 
                 try {
-                    result = eval(displayedString);
+                    result = `=${(eval(displayedString)).toString()}`;
                     calculatingDone = true;
                   }
                   catch(error) {

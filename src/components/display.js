@@ -21,6 +21,8 @@ const DisplayResultStyled = styled.div`
     text-align: right;
     font-size: 3em;
     color: ${props => props.active ? colors.ctaColor : colors.fontDullColor};
+    word-wrap: break-word;
+    max-height: 124px;
 `;
 
 const CleanButtonStyled = styled.div`
@@ -35,9 +37,10 @@ const CleanButtonStyled = styled.div`
 class Display extends Component {
 
     componentWillReceiveProps (nextProps){
-        if (this.calculationsDisplay.scrollHeight > 90) {
-            this.calculationsDisplay.scrollTop = this.calculationsDisplay.scrollHeight;
-            console.log(this.calculationsDisplay.scrollTop,this.calculationsDisplay.scrollHeight);
+        if (this.calculationsDisplay.scrollHeight > 160) {
+            this.calculationsDisplay.scrollTop = this.calculationsDisplay.scrollHeight/2;
+        } else {
+            this.calculationsDisplay.scrollTop = 0;
         }
     }
     render() {
@@ -66,7 +69,7 @@ Display.propTypes = {
     removeEverything: PropTypes.func.isRequired,
     removeLastDigit: PropTypes.func.isRequired,
     displayedString: PropTypes.string,
-    result: PropTypes.number,
+    result: PropTypes.string,
     calculatingDone: PropTypes.bool,
 };
 

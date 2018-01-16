@@ -10,7 +10,7 @@ import { removeEverything, removeLastDigit, addInput, addOperator, addParenth, a
 
 const CalculatorStyled = styled.div`
     background-color: ${colors.backGroundDarkColor};
-    margin-top: 1em;
+    margin: 1em 0;
     transition: margin-top .3s;
     @media (min-width: ${MediaSizes.md}) {
         margin-top: 3em;
