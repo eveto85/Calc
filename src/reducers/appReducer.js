@@ -3,6 +3,8 @@ import { REMOVE_EVERYTHING, REMOVE_LAST_DIGIT, ADD_INPUT, ADD_OPERATOR, ADD_PARE
 import { joinExpressionsIntoString, isItNumber } from '../shared/helpers';
 
 //reducers
+/* Split in a couple of reducers based on action types */
+
 const initialState = {
     input: '',
     operator: '',
@@ -16,6 +18,18 @@ const initialState = {
     curly brackets after each case are for keeping let's in the specific case's block scope, a switch is normally single block
 */
 const calculations = (state = initialState, action) => {    
+    if (state.calculatingDone) {
+        return {
+            ...state,
+            input: '',
+            operator: '',
+            parenth: '',
+            expressions: [],
+            displayedString: '',
+            result: 0,
+            calculatingDone: false
+        }
+    }
     let { input, parenth, operator, expressions, result } = state;
     let actionInput = action.input;
     let actionOperator = action.operator;
@@ -31,7 +45,6 @@ const calculations = (state = initialState, action) => {
             if (exp.value === ')') {closedParentheses++}
         });
     }
-
     switch (action.type) {
         case REMOVE_EVERYTHING:
             return {
@@ -42,6 +55,7 @@ const calculations = (state = initialState, action) => {
                 expressions: [],
                 displayedString: '',
                 result: 0,
+                calculatingDone: false
             }
         case REMOVE_LAST_DIGIT: {
         // TODO set the correct type
@@ -79,7 +93,7 @@ const calculations = (state = initialState, action) => {
         }
         case ADD_INPUT: 
             if (expressions.length && expressions[expressions.length - 1].type === 'input') {
-    /*             Making sure we don't get more than one decimal separator */ 
+            /*   Making sure we don't get more than one decimal separator */ 
             if (actionInput === '.' && expressions[expressions.length - 1].value.includes('.')) {
                     return state;
                 } else {
@@ -137,7 +151,7 @@ const calculations = (state = initialState, action) => {
                     return state;
                 }
             } else {
-                if (openedParentheses > closedParentheses) {
+                if (openedParentheses > closedParentheses && expressions[expressions.length - 1].value !== '(') {
                     expressions.push({type: 'parenth', value: actionParenth});
                     parenth = actionParenth;                
                     input = '';
@@ -188,7 +202,7 @@ const calculations = (state = initialState, action) => {
 
             if (expressions.length) {
                 if (openedParentheses > closedParentheses || expressions[expressions.length - 1].type === 'operator') {
-                    alert("You're missing some closing parentheses");
+                    alert("Invalid input");
                     return state;
                 }
                 displayedString = joinExpressionsIntoString(expressions);                    

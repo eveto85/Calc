@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { colors } from '../shared/colors';
-import { isItNumber } from '../shared/helpers';
 
 const ButtonStyled = styled.div`
     display: flex;

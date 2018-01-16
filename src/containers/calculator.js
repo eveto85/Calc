@@ -34,11 +34,10 @@ class Calculator extends Component {
 
     handleKeyDown(event) {
         let { key } = event;
-        if (key === 'Enter')
-            key = '=';
+        if (key === 'Enter' || key === '=') {
             event.preventDefault();            
             this.props.calculate();
-        if ((/\d/).test(key)) {
+        } else if ((/\d/).test(key)) {
             event.preventDefault();
             this.props.addInput(key);
         } else if (basicOperations.includes(key)) {

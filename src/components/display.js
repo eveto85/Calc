@@ -8,7 +8,7 @@ import Backspace from '../assets/ic_backspace.svg';
 const DisplayStyled = styled.div`
     background-color: ${colors.backGroundDisplayColor};
 `;
-const ScreenCalculationsStyled = styled.div`
+const DisplayCalculationsStyled = styled.div`
     color: ${colors.fontLightColor};
     font-size: 3em;
     text-align: right;
@@ -16,7 +16,7 @@ const ScreenCalculationsStyled = styled.div`
     overflow-y: scroll;
     max-height: 124px;
 `;
-const ScreenResultStyled = styled.div`
+const DisplayResultStyled = styled.div`
     margin-top: 1em;
     text-align: right;
     font-size: 3em;
@@ -33,14 +33,20 @@ const CleanButtonStyled = styled.div`
 `;
 
 class Display extends Component {
+
+    componentWillReceiveProps (nextProps){
+        if (this.calculationsDisplay.scrollHeight > 90) {
+            this.calculationsDisplay.scrollTop = this.calculationsDisplay.scrollHeight;
+            console.log(this.calculationsDisplay.scrollTop,this.calculationsDisplay.scrollHeight);
+        }
+    }
     render() {
-        //$0.scrollTop = $0.scrollHeight
         return (
             <DisplayStyled>
                 <Row Padding="1em 15px">
                     <Column>
-                        <ScreenCalculationsStyled>{this.props.displayedString || '0'}</ScreenCalculationsStyled>
-                        <ScreenResultStyled active={this.props.calculatingDone}>{this.props.result}</ScreenResultStyled>
+                        <DisplayCalculationsStyled innerRef={r => this.calculationsDisplay = r}>{this.props.displayedString || '0'}</DisplayCalculationsStyled>
+                        <DisplayResultStyled active={this.props.calculatingDone}>{this.props.result}</DisplayResultStyled>
                     </Column>
                 </Row>
                 <Row JustifyContent="space-between" Padding="0.7em 0">
