@@ -48,7 +48,7 @@ class Display extends Component {
             <DisplayStyled>
                 <Row Padding="1em 15px">
                     <Column>
-                        <DisplayCalculationsStyled innerRef={r => this.calculationsDisplay = r}>{this.props.displayedString || '0'}</DisplayCalculationsStyled>
+                        <DisplayCalculationsStyled className='scrollbar' innerRef={r => this.calculationsDisplay = r}>{this.props.displayedString || '0'}</DisplayCalculationsStyled>
                         <DisplayResultStyled active={this.props.calculatingDone}>{this.props.result}</DisplayResultStyled>
                     </Column>
                 </Row>
