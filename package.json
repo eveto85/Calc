@@ -21,5 +21,6 @@
   "babel":{
     "plugins": ["styled-components"],
     "presets": [ "react-app" ]
-  }
+  },
+  "homepage": "."
 }
