@@ -15,6 +15,19 @@ const DisplayCalculationsStyled = styled.div`
     word-wrap: break-word;
     overflow-y: scroll;
     max-height: 124px;
+    &::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
+        background-color: ${colors.backGroundDisplayColor};
+    }
+    &::-webkit-scrollbar {
+        width: 5px;
+        background-color: ${colors.backGroundDisplayColor};
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: ${colors.backGroundDisplayColor};
+        border: 1px solid ${colors.backGroundDisplayColor};
+    }
 `;
 const DisplayResultStyled = styled.div`
     margin-top: 1em;
@@ -43,13 +56,18 @@ class Display extends Component {
             this.calculationsDisplay.scrollTop = 0;
         }
     }
+    /* CleanButtonStyled > img needs an actual svg loader and wrapper for inlining instead */
     render() {
         return (
             <DisplayStyled>
                 <Row Padding="1em 15px">
                     <Column>
-                        <DisplayCalculationsStyled className='scrollbar' innerRef={r => this.calculationsDisplay = r}>{this.props.displayedString || '0'}</DisplayCalculationsStyled>
-                        <DisplayResultStyled active={this.props.calculatingDone}>{this.props.result}</DisplayResultStyled>
+                        <DisplayCalculationsStyled innerRef={r => this.calculationsDisplay = r}>
+                            {this.props.displayedString || '0'}
+                        </DisplayCalculationsStyled>
+                        <DisplayResultStyled active={this.props.calculatingDone}>
+                            {this.props.result}
+                        </DisplayResultStyled>
                     </Column>
                 </Row>
                 <Row JustifyContent="space-between" Padding="0.7em 0">
@@ -57,7 +75,9 @@ class Display extends Component {
                         <CleanButtonStyled onClick={this.props.removeEverything}>C</CleanButtonStyled>
                     </Column>
                     <Column  xs="6">
-                        <CleanButtonStyled onClick={this.props.removeLastDigit}><img src={Backspace} alt="Backspace"/></CleanButtonStyled>
+                        <CleanButtonStyled onClick={this.props.removeLastDigit}>
+                            <img src={Backspace} alt="Backspace"/>
+                        </CleanButtonStyled>
                     </Column>
                 </Row>
             </DisplayStyled>

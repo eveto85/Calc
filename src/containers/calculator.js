@@ -68,12 +68,27 @@ class Calculator extends Component {
             <Row>
                 <Column>
                     <CalculatorStyled>
-                        <DisplayStyled removeEverything={this.props.removeEverything} removeLastDigit={this.props.removeLastDigit} displayedString={this.props.displayedString} result={this.props.result} calculatingDone={this.props.calculatingDone} />
+                        <DisplayStyled 
+                          removeEverything={this.props.removeEverything} 
+                          removeLastDigit={this.props.removeLastDigit} 
+                          displayedString={this.props.displayedString} 
+                          result={this.props.result} 
+                          calculatingDone={this.props.calculatingDone} 
+                        />
                         <Row>
                         {
                             buttons.map(butt =>
                                 <Column xs="6" key={butt.value}>
-                                    <Button type={butt.type} value={butt.value} addInput={this.props.addInput} addOperator={this.props.addOperator} addParenth={this.props.addParenth} addPercent={this.props.addPercent} toggleNegation={this.props.toggleNegation} calculate={this.props.calculate}/>
+                                    <Button 
+                                      type={butt.type} 
+                                      value={butt.value} 
+                                      addInput={this.props.addInput} 
+                                      addOperator={this.props.addOperator} 
+                                      addParenth={this.props.addParenth} 
+                                      addPercent={this.props.addPercent} 
+                                      toggleNegation={this.props.toggleNegation} 
+                                      calculate={this.props.calculate} 
+                                    />
                                 </Column>
                             )
                         }

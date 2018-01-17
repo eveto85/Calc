@@ -3,7 +3,7 @@ import { REMOVE_EVERYTHING, REMOVE_LAST_DIGIT, ADD_INPUT, ADD_OPERATOR, ADD_PARE
 import { joinExpressionsIntoString, isItNumber } from '../shared/helpers';
 
 //reducers
-/* Split in a couple of reducers based on action types */
+/* In an actual, bigger project -split in a couple of reducers based on action types */
 
 const initialState = {
     input: '',
@@ -15,7 +15,7 @@ const initialState = {
     calculatingDone: false
 }
 /* state.expressions = [{type: 'input': value:'8'}];
-    curly brackets after each case are for keeping let's in the specific case's block scope, a switch is normally single block
+    curly brackets after some case are for keeping let's in the specific case's block scope, a switch is normally single block
 */
 const calculations = (state = initialState, action) => {    
     let { input, parenth, operator, expressions, result } = state;
@@ -46,7 +46,6 @@ const calculations = (state = initialState, action) => {
                 calculatingDone: false
             }
         case REMOVE_LAST_DIGIT: 
-        // TODO set the correct type
             if (expressions.length > 0) {
                 if (expressions[expressions.length - 1].value.length === 1) {
                     expressions.pop();
@@ -55,17 +54,18 @@ const calculations = (state = initialState, action) => {
                 }
                 if (expressions.length) {
                     const { type, value } = expressions[expressions.length - 1];
+                    let lastStroke = value[value.length - 1];
                     input =''; parenth = ''; operator = '';
 
                     switch (type) {
                         case 'input':
-                            input = value[value.length - 1];
+                            input = lastStroke;
                         break;
                         case 'operator':
-                            operator = value[value.length - 1];
+                            operator = lastStroke;
                         break;
                         case 'parenth':
-                            parenth = value[value.length - 1];
+                            parenth = lastStroke;
                         break;
                     }
                 }

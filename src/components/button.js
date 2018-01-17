@@ -39,8 +39,6 @@ class Button extends Component {
             this.props.addOperator(this.props.value);
         } else if (this.props.type === 'cta') {
             this.props.calculate();
-        } else {
-            // this.props.addOperator(this.props.value);
         }
     }
 
