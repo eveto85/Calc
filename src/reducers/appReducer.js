@@ -18,18 +18,6 @@ const initialState = {
     curly brackets after each case are for keeping let's in the specific case's block scope, a switch is normally single block
 */
 const calculations = (state = initialState, action) => {    
-    if (state.calculatingDone) {
-        return {
-            ...state,
-            input: '',
-            operator: '',
-            parenth: '',
-            expressions: [],
-            displayedString: '',
-            result: "0",
-            calculatingDone: false
-        }
-    }
     let { input, parenth, operator, expressions, result } = state;
     let actionInput = action.input;
     let actionOperator = action.operator;
@@ -57,7 +45,7 @@ const calculations = (state = initialState, action) => {
                 result: "0",
                 calculatingDone: false
             }
-        case REMOVE_LAST_DIGIT: {
+        case REMOVE_LAST_DIGIT: 
         // TODO set the correct type
             if (expressions.length > 0) {
                 if (expressions[expressions.length - 1].value.length === 1) {
@@ -88,13 +76,20 @@ const calculations = (state = initialState, action) => {
                 operator: operator,
                 parenth: parenth,
                 displayedString: joinExpressionsIntoString(expressions),
-                expressions: expressions
+                expressions: expressions,
+                calculatingDone: false,
+                result: '0'
             }
-        }
         case ADD_INPUT: 
             if (expressions.length && expressions[expressions.length - 1].type === 'input') {
-            /*   Making sure we don't get more than one decimal separator */ 
-            if (actionInput === '.' && expressions[expressions.length - 1].value.includes('.')) {
+                /*  stripping off 0 to avoid input as 012+123 which would fail in strict mode */
+                if (input && lastExpressionValue === '0' && lastExpressionValue.length === 1 && actionInput !== '.') {
+                    expressions[expressions.length - 1].value = actionInput;
+                    input = actionInput;    
+                    operator = '';
+                    parenth = '';
+                } else if (actionInput === '.' && lastExpressionValue.includes('.')) {
+                /*   Making sure we don't get more than one decimal separator */ 
                     return state;
                 } else {
                     expressions[expressions.length - 1].value += actionInput;
@@ -114,7 +109,9 @@ const calculations = (state = initialState, action) => {
                 operator: operator,
                 parenth: parenth,
                 displayedString: joinExpressionsIntoString(expressions),
-                expressions: expressions
+                expressions: expressions,
+                calculatingDone: false,
+                result: '0'
             }
         case ADD_OPERATOR: 
             if (expressions.length === 0) {
@@ -138,9 +135,11 @@ const calculations = (state = initialState, action) => {
                 operator: operator,
                 parenth: parenth,
                 expressions: expressions,
-                displayedString: joinExpressionsIntoString(expressions)
+                displayedString: joinExpressionsIntoString(expressions),
+                calculatingDone: false,
+                result: '0'
             }
-        case ADD_PARENTH: {
+        case ADD_PARENTH: 
             if (actionParenth === '(') {
                 if (expressions.length === 0 || operator || parenth) {
                     expressions.push({type: 'parenth', value: actionParenth});
@@ -166,36 +165,42 @@ const calculations = (state = initialState, action) => {
                 operator: operator,
                 parenth: parenth,
                 displayedString: joinExpressionsIntoString(expressions),
-                expressions: expressions
+                expressions: expressions,
+                calculatingDone: false,
+                result: '0'
             }
-        }
-        case ADD_PERCENT: {
+        case ADD_PERCENT: 
             if (input && isItNumber(lastExpressionValue) && lastExpressionValue !== '0' && lastExpressionValue !== '.') {
                 const fixedDigitsLength =  lastExpressionValue.replace(/^-?\d*\.?/, '').length;
                 expressions[expressions.length - 1].value = ((parseFloat(lastExpressionValue))/100).toFixed(fixedDigitsLength + 2);
+                return {
+                    ...state,
+                    displayedString: joinExpressionsIntoString(expressions),
+                    expressions: expressions,
+                    calculatingDone: false,
+                    result: '0'
+                }
             } else {
                 return state;
             }
-            return {
-                ...state,
-                displayedString: joinExpressionsIntoString(expressions),
-                expressions: expressions
-            }
-        }
         case TOGGLE_NEGATION: 
-            if (input && isItNumber(lastExpressionValue) && lastExpressionValue !== '0' && lastExpressionValue !== '.') {
+            /*  making sure the last input exists && ==!'.'||'0'  */
+            if (input && isItNumber(lastExpressionValue) && lastExpressionValue !== '0') {
                 const newValue = parseFloat(lastExpressionValue) * -1;
                 expressions[expressions.length - 1].value = String(newValue);
+                input = newValue;
+                return {
+                    ...state,
+                    input: input,
+                    operator: operator,
+                    parenth: parenth,
+                    displayedString: joinExpressionsIntoString(expressions),
+                    expressions: expressions,
+                    calculatingDone: false,
+                    result: '0'
+                }
             } else {
                 return state;
-            }
-            return {
-                ...state,
-                input: input,
-                operator: operator,
-                parenth: parenth,
-                displayedString: joinExpressionsIntoString(expressions),
-                expressions: expressions
             }
         case CALCULATE: {
             let { displayedString, calculatingDone } = state;
@@ -208,29 +213,38 @@ const calculations = (state = initialState, action) => {
                 displayedString = joinExpressionsIntoString(expressions);                    
 
                 try {
-                    result = `=${(eval(displayedString)).toString()}`;
+                    const evaluatedAmount = eval(displayedString).toString();
+                    result = `=${evaluatedAmount}`;
+                    input = evaluatedAmount;
+                    operator = '';
+                    parenth = '';
+                    displayedString = '';
                     calculatingDone = true;
-                  }
-                  catch(error) {
+                    expressions = [{type: 'input', value: evaluatedAmount}];
+
+                } catch (error) {
                     console.error(error);
                     alert("Something went totally wrong! Try pressing F12(Windows) or Cmd+Alt+I(Mac) when the console opens calculate whatever you wanted me to calculate. "+error);
-
-                  }
+                }
             } else {
                 return state;
             }
             return {
                 ...state,
+                input,
+                operator,
+                parenth,
                 displayedString,
-                result: result,
-                calculatingDone
+                expressions,
+                calculatingDone,
+                result
             }
         }
         default:
             return state
     }
 }
-
+/* Not needed in our case but if we had multiple reducers it would be */
 const appReducer = combineReducers({
     calculations
 });
