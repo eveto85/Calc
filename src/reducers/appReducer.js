@@ -52,7 +52,8 @@ const calculations = (state = initialState, action) => {
                 if (expressions[expressions.length - 1].value.length === 1) {
                     expressions.pop();
                 } else {
-                    expressions[expressions.length - 1].value = expressions[expressions.length - 1].value.slice(0,-1);
+                    const temper = expressions.pop();
+                    expressions.push({...temper, value: temper.value.slice(0,-1)});
                 }
                 if (expressions.length) {
                     const { type, value } = expressions[expressions.length - 1];
@@ -86,7 +87,8 @@ const calculations = (state = initialState, action) => {
             if (expressions.length && expressions[expressions.length - 1].type === 'input') {
                 /*  stripping off 0 to avoid input as 012+123 which would fail in strict mode */
                 if (input && lastExpressionValue === '0' && lastExpressionValue.length === 1 && actionInput !== '.') {
-                    expressions[expressions.length - 1].value = actionInput;
+                    const temper = expressions.pop();
+                    expressions.push({...temper, value: actionInput});
                     input = actionInput;    
                     operator = '';
                     parenth = '';
@@ -94,7 +96,8 @@ const calculations = (state = initialState, action) => {
                 /*   Making sure we don't get more than one decimal separator */ 
                     return state;
                 } else {
-                    expressions[expressions.length - 1].value += actionInput;
+                    const temper = expressions.pop();
+                    expressions.push({...temper, value: temper.value + actionInput});
                     input = actionInput;
                     operator = '';
                     parenth = '';
@@ -120,7 +123,8 @@ const calculations = (state = initialState, action) => {
                 return state;
             }
             if (operator && expressions[expressions.length - 1].type === 'operator') {
-                expressions[expressions.length - 1].value === actionOperator;
+                const temper = expressions.pop();
+                expressions.push({...temper, value: actionOperator});
                 operator = actionOperator;
                 parenth = '';
                 input = '';
@@ -174,7 +178,8 @@ const calculations = (state = initialState, action) => {
         case ADD_PERCENT: 
             if (input && isItNumber(lastExpressionValue) && lastExpressionValue !== '0' && lastExpressionValue !== '.') {
                 const fixedDigitsLength = checkFixedDigitsLength(lastExpressionValue);
-                expressions[expressions.length - 1].value = ((parseFloat(lastExpressionValue))/100).toFixed(fixedDigitsLength + 2);
+                const temper = expressions.pop();
+                expressions.push({...temper, value: ((parseFloat(lastExpressionValue))/100).toFixed(fixedDigitsLength + 2)});
                 return {
                     ...state,
                     displayedString: joinExpressionsIntoString(expressions),
@@ -189,7 +194,8 @@ const calculations = (state = initialState, action) => {
             /*  making sure the last input exists && ==!'.'||'0'  */
             if (input && isItNumber(lastExpressionValue) && lastExpressionValue !== '0') {
                 const newValue = parseFloat(lastExpressionValue) * -1;
-                expressions[expressions.length - 1].value = String(newValue);
+                const temper = expressions.pop();
+                expressions.push({...temper, value: String(newValue)});
                 input = newValue;
                 return {
                     ...state,
@@ -218,9 +224,8 @@ const calculations = (state = initialState, action) => {
                     let evaluatedAmount = eval(displayedString);
                     const fixedDigitsLength = checkFixedDigitsLength(evaluatedAmount.toString());
                     if (fixedDigitsLength > 3) {
-                        //all that conversion is to avoid having 98.000 after fixing to 3 decimals
+                        //all that conversion is to avoid having 98.000(removing zeros) after fixing to 3 decimals
                         evaluatedAmount = (parseFloat(evaluatedAmount.toFixed(3))).toString();
-                        //if only zeros get rid of them
                     } else {
                         evaluatedAmount.toString();
                     }
