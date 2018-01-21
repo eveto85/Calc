@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { REMOVE_EVERYTHING, REMOVE_LAST_DIGIT, ADD_INPUT, ADD_OPERATOR, ADD_PARENTH, ADD_PERCENT, TOGGLE_NEGATION, CALCULATE } from '../actions';
-import { joinExpressionsIntoString, isItNumber } from '../shared/helpers';
+import { joinExpressionsIntoString, isItNumber, checkFixedDigitsLength } from '../shared/helpers';
 
 //reducers
 /* In an actual, bigger project -split in a couple of reducers based on action types */
@@ -18,7 +18,9 @@ const initialState = {
     curly brackets after some case are for keeping let's in the specific case's block scope, a switch is normally single block
 */
 const calculations = (state = initialState, action) => {    
-    let { input, parenth, operator, expressions, result } = state;
+    let { input, parenth, operator, result } = state;
+    //avoid mutation
+    let expressions = state.expressions.slice();
     let actionInput = action.input;
     let actionOperator = action.operator;
     let actionParenth = action.parenth;
@@ -171,7 +173,7 @@ const calculations = (state = initialState, action) => {
             }
         case ADD_PERCENT: 
             if (input && isItNumber(lastExpressionValue) && lastExpressionValue !== '0' && lastExpressionValue !== '.') {
-                const fixedDigitsLength =  lastExpressionValue.replace(/^-?\d*\.?/, '').length;
+                const fixedDigitsLength = checkFixedDigitsLength(lastExpressionValue);
                 expressions[expressions.length - 1].value = ((parseFloat(lastExpressionValue))/100).toFixed(fixedDigitsLength + 2);
                 return {
                     ...state,
@@ -213,7 +215,16 @@ const calculations = (state = initialState, action) => {
                 displayedString = joinExpressionsIntoString(expressions);                    
 
                 try {
-                    const evaluatedAmount = eval(displayedString).toString();
+                    let evaluatedAmount = eval(displayedString);
+                    const fixedDigitsLength = checkFixedDigitsLength(evaluatedAmount.toString());
+                    if (fixedDigitsLength > 3) {
+                        //all that conversion is to avoid having 98.000 after fixing to 3 decimals
+                        evaluatedAmount = (parseFloat(evaluatedAmount.toFixed(3))).toString();
+                        //if only zeros get rid of them
+                    } else {
+                        evaluatedAmount.toString();
+                    }
+                    
                     result = `=${evaluatedAmount}`;
                     input = evaluatedAmount;
                     operator = '';

@@ -15,7 +15,6 @@ Better messaging/notification ux;
 Add calculations history and possibility to revive an old calculation
 Split the reducer and cleanup;
 
-
 Code/file structure
 
 If it were a huge project I'd probably separate things a bit differently.

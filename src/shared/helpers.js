@@ -31,3 +31,8 @@ export const findSubstringInAnArr = (arr, str) => (
 export const joinExpressionsIntoString = arr => (
     arr.map(obj => obj.value).join('')
 );
+
+export const checkFixedDigitsLength = stringifiedValue => (
+    stringifiedValue.replace(/^-?\d*\.?/, '').length
+);
+
