@@ -25,27 +25,27 @@ describe('app reducer', () => {
         ).toEqual({
             ...initialState,
             input: '1',
-            expressions: [{type: 'input', value: '1'}],
+            expressions: [{ type: 'input', value: '1' }],
             displayedString: '1'
         })
 
         expect(
             appReducer({
-                    ...initialState,
-                    input: '1',
-                    expressions: [{type: 'input', value: '1'}],
-                    displayedString: '1'
-                },
+                ...initialState,
+                input: '1',
+                expressions: [{ type: 'input', value: '1' }],
+                displayedString: '1'
+            },
                 {
                     type: ADD_INPUT,
                     input: '6'
                 }
             )
         ).toEqual({
-                ...initialState,
-                input: '6',
-                expressions: [{type: 'input', value: '16'}],
-                displayedString: '16'
+            ...initialState,
+            input: '6',
+            expressions: [{ type: 'input', value: '16' }],
+            displayedString: '16'
         })
     })
 })
