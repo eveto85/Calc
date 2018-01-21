@@ -40,3 +40,6 @@ Maybe domain/page based.
 
 etc.etc...
 or even move redux files in corresponding domains/routes.(Never tried that approach though)
+
+
+http://tools.jfmedier.dk/test-calc/

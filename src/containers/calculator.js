@@ -101,9 +101,9 @@ class Calculator extends Component {
 }
 
 const mapStateToProps = state => ({
-    result: state.calculations.result,
-    displayedString: state.calculations.displayedString,
-    calculatingDone: state.calculations.calculatingDone
+    result: state.result,
+    displayedString: state.displayedString,
+    calculatingDone: state.calculatingDone
 });
 
 const mapDispatchToProps = {

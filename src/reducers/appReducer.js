@@ -1,4 +1,3 @@
-import { combineReducers } from 'redux';
 import { REMOVE_EVERYTHING, REMOVE_LAST_DIGIT, ADD_INPUT, ADD_OPERATOR, ADD_PARENTH, ADD_PERCENT, TOGGLE_NEGATION, CALCULATE } from '../actions';
 import { joinExpressionsIntoString, isItNumber, checkFixedDigitsLength } from '../shared/helpers';
 
@@ -17,7 +16,7 @@ const initialState = {
 /* state.expressions = [{type: 'input': value:'8'}];
     curly brackets after some case are for keeping let's in the specific case's block scope, a switch is normally single block
 */
-const calculations = (state = initialState, action) => {    
+export default (state = initialState, action) => {    
     let { input, parenth, operator, result } = state;
     //avoid mutation
     let expressions = state.expressions.slice();
@@ -260,9 +259,3 @@ const calculations = (state = initialState, action) => {
             return state
     }
 }
-/* Not needed in our case but if we had multiple reducers it would be */
-const appReducer = combineReducers({
-    calculations
-});
-
-export default appReducer;
